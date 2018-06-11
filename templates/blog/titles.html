@@ -1,0 +1,27 @@
+<!-- 继承已建立的base.html模板 -->
+{% extends 'base.html' %}
+
+<!-- block title块标签和block content块标签对"父模板"base.html中的同名块标签进行重写 -->
+{% block title %}blog titles{% endblock %}
+
+{% block content %}
+    <div class="row text-center vertical-middle-sm">
+        <h1>我的博客</h1>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-8">
+            <ul>
+                <!-- 用一个循环把view.py的blog_title()类中的blogs的值赋值到blog中 -->
+                {% for blog in blogs %}
+		    <!-- 用双括号的方式来显示变量应用的数据 -->
+                    <li><a href="{{ blog.id }}">{{ blog.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    <div class="col-xs-6 col-md-4">
+        <h2>广告</h2>
+        <p>Myfour:www.bestmyfour.cn</p>
+        <img width="200px" src="http://mrwallpaper.com/wp-content/uploads/Minimalism-Artwork-Simple-Background-970x606.jpg">
+    </div>
+    </div>
+{% endblock %}

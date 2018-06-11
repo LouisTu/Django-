@@ -1,0 +1,20 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 定义title的块标签， 包裹跟title相关的快内容 -->
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+
+</head>
+<body>
+    {% include 'header.html' %}
+    <div class="container">
+        <!-- 定义content的块标签， 包裹跟content相关的快内容 -->
+        {% block content %}{% endblock %}
+    </div>
+    {% include 'footer.html' %}
+    {% block javascript %}{% endblock %}
+</body>
+</html>

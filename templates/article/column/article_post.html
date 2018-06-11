@@ -1,0 +1,155 @@
+{% extends 'article/base.html' %}
+{% load staticfiles %}
+{% block title %}article column{% endblock %}
+{% block content %}
+<style>
+.translate-container div{
+	width: 50%;
+}
+.translate-left{
+	float:left;
+}
+.translate-right{
+	float:right;
+}
+</style>
+<div style="margin-left: 10px;">
+    <form class="form-horizontal" action="." method="post">{% csrf_token %}
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-2 text-right"><span>标题：</span></div>
+            <div class="col-md-10 text-left">{{ article_post_form.title }}</div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-2 text-right"><span>栏目：</span></div>
+            <div class="col-md-10 text-left">
+                <select id="which_column">
+                {% for column in article_columns %}
+                    <option value="{{ column.id }}">{{ column.column }}</option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-2 text-right"><span>文章标签：</span></div>
+            <div class="col-md-10 text-left">
+            {% for tag in article_tags %}
+            <label class="checkbox-inline">
+                <input class="tagcheckbox" type="checkbox" id="{{ tag.id }}" name="article_tag" value="{{ tag.tag }}">{{ tag.tag }} 
+            </label>
+            {% empty %}
+            <p>You have not type tags for articles. Please <a href="{% url 'article:article_tag' %}">input your tags</a></p>
+            {% endfor %}
+            </div>
+        </div>
+	<!-- <div class="row">
+		<div class="col-md-2 text-right"><span>翻译：</span></div>
+		<div class="col-md-10 translate-container">
+			<div class="col-md-6 translate-left">
+				<input type="text" class="form-control" aria-label="...">
+			</div>
+			<div class="col-md-6 translate-right">
+				<input type="text" class="form-control" aria-label="...">
+			</div>
+		</div>
+    </div> -->
+    <!-- 翻译模块 -->
+    <!-- <div>
+            <form action="#" method="post">  
+                {% csrf_token %}  
+                <div style="width: 318px">  
+                    <div class="form-group" style="width: 230px; padding: 30px 5px 30px 30px; float: left">  
+                        {{ fanyi_form.fanyi_content }}  
+                    </div>  
+                    <button type="submit" class="btn btn-default" style="float: left;margin:30px 30px 30px 0;">翻译</button>  
+                    {% if fanyi_dict %}  
+                    <div class="fanyitext" style="width: 249px;float: left; padding: 10px; margin-left: 30px; border: 1px solid rgba(0,0,0,0.08);">  
+                        <p align="center">有道词典结果</p>  
+                        <p><b>{{ fanyi_dict.q }}</b></p>  
+                        <p>
+                            <span>英：</span>  
+                            <span style="color: #a0a0a0;">[{{ fanyi_dict.yinshi }}]</span>  
+                            <span style="margin-left: 20px">美：</span>  
+                            <span style="color: #a0a0a0;">[{{ fanyi_dict.meishi }}]</span>  
+                        </p>  
+                            {% for explains in fanyi_dict.explains_list %}  
+                            <p>{{ explains }}</p>  
+                            {% endfor %}  
+                    </div>  
+                    {% endif %}  
+                </div>  
+            </form>  
+        </div> -->
+        
+        <div class="row" style="margin-top:10px;">
+            <div class="col-md-2 text-right"><span>内容：</span></div>
+            <div id="editormd" class="col-md-10">
+                <textarea style="display:none;" id="id_body"></textarea>
+            </div>
+        </div>
+        <div class="row">
+            <input type="button" class="btn btn-primary btn-lg" value="发布" onclick="publish_article()" >
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="{% static 'js/jquery-3.2.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/layer.js' %}"></script>
+<script type="text/javascript" src="{% static 'editor/editormd.min.js' %}"></script>
+<script type="text/javascript">
+    $(function(){
+        var editor=editormd("editormd",{
+            width:"100%",
+            height:640,
+            syncScrolling:"single",
+            emoji:true,
+            path:"{% static 'editor/lib/' %}"
+        });
+    });
+
+</script>
+<script type="text/javascript" src="{% static 'js/json2.js' %}"></script>
+<script type="text/javascript">
+function publish_article(){
+    var title = $("#id_title").val();
+    var column_id = $("#which_column").val();
+    var body = $("#id_body").val();
+    var article_tags = [];
+    $.each($("input[name='article_tag']:checked"), function(){article_tags.push($(this).val());});
+    $.ajax({
+        url: "{% url 'article:article_post' %}",
+        type: "POST",
+        data: {"title":title, "column_id":column_id, "body":body, "tags":JSON.stringify(article_tags)},
+        success:function (e) {
+            e=JSON.parse(e);
+            id=e["id"];
+            slug=e["slug"];
+            if(e["e"]=="1"){
+                layer.msg("successful.");
+                location.href="{% url 'article:article_list'%}";
+            }else if(e["e"]=="2"){
+                layer.msg("sorry.");
+            }else{
+                layer.msg("项目名称必须写，不能空");
+            }
+        },
+    });
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
